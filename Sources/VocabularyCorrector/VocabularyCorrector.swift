@@ -1,7 +1,7 @@
 /// Post-transcription correction using known vocabulary.
 ///
 /// For each word in the transcription output, if a vocabulary term is within
-/// edit distance 2 (case-insensitive), the vocabulary term is substituted.
+/// a length-scaled edit distance (case-insensitive), the vocabulary term is substituted.
 /// Words shorter than 4 characters are skipped to avoid false positives on
 /// common short words like "the", "is", "go".
 public enum VocabularyCorrector {
@@ -29,12 +29,13 @@ public enum VocabularyCorrector {
 
             var bestMatch: String?
             var bestDistance = Int.max
+            let maxDist = wordLower.count >= 7 ? 2 : 1
 
             for (original, vocabLower) in lowercaseVocab {
                 if abs(wordLower.count - vocabLower.count) > 2 { continue }
 
                 let dist = editDistance(wordLower, vocabLower)
-                if dist < bestDistance && dist <= 2 && dist > 0 {
+                if dist < bestDistance && dist <= maxDist && dist > 0 {
                     bestDistance = dist
                     bestMatch = original
                     if dist == 1 { break }

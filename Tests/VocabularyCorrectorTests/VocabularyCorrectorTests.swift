@@ -21,13 +21,40 @@ struct VocabularyCorrectorTests {
         #expect(result == "run kubectl apply")
     }
 
-    @Test("edit distance 2 corrected")
+    @Test("edit distance 2 corrected for long words")
     func editDistance2() {
         let result = VocabularyCorrector.correct(
-            text: "run kubetl apply",
-            vocabulary: ["kubectl"]
+            text: "run terrafurn apply",
+            vocabulary: ["terraform"]
         )
-        #expect(result == "run kubectl apply")
+        #expect(result == "run terraform apply")
+    }
+
+    @Test("short words require closer match")
+    func shortWordDistance2NotCorrectedToVocabulary() {
+        let result = VocabularyCorrector.correct(
+            text: "make sure it works",
+            vocabulary: ["sudo"]
+        )
+        #expect(result == "make sure it works")
+    }
+
+    @Test("short words with deletion and substitution are not corrected")
+    func shortWordDistance2DeletionSubstitutionNotCorrectedToVocabulary() {
+        let result = VocabularyCorrector.correct(
+            text: "we should just reuse it",
+            vocabulary: ["jud"]
+        )
+        #expect(result == "we should just reuse it")
+    }
+
+    @Test("genuine short edit distance 1 correction still applies")
+    func shortWordDistance1StillCorrected() {
+        let result = VocabularyCorrector.correct(
+            text: "use sudp carefully",
+            vocabulary: ["sudo"]
+        )
+        #expect(result == "use sudo carefully")
     }
 
     @Test("edit distance 3 not corrected")
